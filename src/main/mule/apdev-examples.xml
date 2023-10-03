@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<flow name="helloFlow" doc:id="ce9265e3-5116-484e-91cb-6018acf3785e" >
+		<http:listener doc:name="Listener" doc:id="57f1b49a-f44d-4a0b-9b8f-01854bd2bbcd" config-ref="HTTP_Listener_config" path="/hello" allowedMethods="GET"/>
+		<set-payload value="Hello" doc:name="Hello" doc:id="4e75c6e5-829a-499a-9bf2-374fd9a79173" />
+<vm:publish queueName="goodbye" doc:name="Publish" doc:id="f293f42b-a82a-4f7f-bf93-ca2804e17ba2" config-ref="VM_Config"/>
+<!-- [STUDIO:"VM Goodbye"]				<vm:publish-consume doc:name="VM Goodbye" doc:id="3c215313-16fe-4b55-a167-2121c3d5b958" config-ref="VM_Config" queueName="goodbye" timeout="300"/> [STUDIO] -->
+<!-- [STUDIO:"GET /goodbye"]		<http:request method="GET" doc:name="GET /goodbye" doc:id="e2712491-5058-48a6-9a2c-d0ba69eee72c" config-ref="HTTP_Request_configuration" path="/goodbye" responseTimeout="300000"/> [STUDIO] -->
+		<logger level="INFO" doc:name="Logger" doc:id="72894166-9a88-4b6e-ab37-8461b96b63b1" message="#[payload]"/>
+	</flow>
+	<flow name="goodbyeFlow" doc:id="4752b6fd-4a7d-4a43-ab7a-a0f3a5f61064" >
+		<vm:listener queueName="goodbye" doc:name="Listener" doc:id="c3a1da0f-a7b9-458c-90c4-96a3fa1aae83" config-ref="VM_Config"/>
+		<set-payload value="#[upper('Goodbye')]" doc:name="Goodbye" doc:id="432438a4-cb17-4dbc-89ed-d97808fe4e9f" />
+		<logger level="INFO" doc:name="Logger" doc:id="2ce7ceda-6482-4b9d-b6c5-e86e743e1779" message="#[attributes.queryParams]"/>
+	</flow>
+</mule>
